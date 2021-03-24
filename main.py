@@ -1,4 +1,5 @@
 from BoltGSOpsClient import BoltGSOpsClient
+from BoltGSPerf import BoltGSPerf
 
 
 def bolt_gs_ops_handler(request):
@@ -66,3 +67,8 @@ def bolt_gs_validate_obj_handler(request):
     """
     bolt_gs_ops_client = BoltGSOpsClient()
     return bolt_gs_ops_client.validate_obj_md5(request)
+
+
+def bolt_gs_perf_handler(request):
+    bolt_gs_perf = BoltGSPerf()
+    return bolt_gs_perf.process_event(request)

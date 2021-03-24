@@ -14,7 +14,7 @@ class BoltGSOpsClient:
 
     def __init__(self):
         self._storage_client = None
-        self._bolt_url = os.environ.get("BOLT_URL").replace('{region}', self._get_region())
+        self._bolt_url = os.environ.get("BOLT_URL").replace('{region}', self.get_region())
 
     def process_event(self, request):
         """
@@ -194,7 +194,8 @@ class BoltGSOpsClient:
             'Deleted': 'True'
         }
 
-    def _get_region(self):
+    @staticmethod
+    def get_region():
         """
         Get Deployment region of the function
         :return: region
