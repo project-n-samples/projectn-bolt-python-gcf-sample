@@ -1,5 +1,6 @@
 from BoltGSOpsClient import BoltGSOpsClient
 from BoltGSPerf import BoltGSPerf
+from BoltAutoHeal import BoltAutoHeal
 
 
 def bolt_gs_ops_handler(request):
@@ -72,3 +73,8 @@ def bolt_gs_validate_obj_handler(request):
 def bolt_gs_perf_handler(request):
     bolt_gs_perf = BoltGSPerf()
     return bolt_gs_perf.process_event(request)
+
+
+def bolt_auto_heal_handler(request):
+    bolt_auto_heal = BoltAutoHeal()
+    return bolt_auto_heal.process_event(request)
