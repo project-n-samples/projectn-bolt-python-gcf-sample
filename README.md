@@ -109,3 +109,83 @@ gcloud functions deploy <function-name> \
       ```json
       {"bucket": "<bucket>", "key": "<key>"}
       ```
+
+      
+#### bolt_gs_perf_handler
+
+* bolt_gs_perf_handler represents a Google Cloud Function that is invoked by an HTTP Request for performing
+  Bolt / GS Performance testing. Before running this function, ensure that a source bucket has been crunched by
+  `Bolt` with cleaner turned `OFF`. To use this Function, change the entry point to `bolt_gs_perf_handler`.
+  
+
+* bolt_gs_perf_handler accepts the following input parameters as part of the HTTP Request:
+  * requestType - type of request / operation to be performed. The following requests are supported:
+    * list_objects - list objects
+    * download_object - download object
+    * download_object_ttfb - download object (first byte) 
+    * download_object_passthrough - download object (via passthrough) of unmonitored bucket
+    * download_object_passthrough_ttfb - download object (first byte via passthrough) of unmonitored bucket 
+    * upload_object - upload object
+    * delete_object - delete object
+    * all - upload, download, delete, list objects (default request if none specified)
+      
+  * bucket - bucket name
+    
+
+* Following are examples of various HTTP requests, that can be used to invoke the function.
+    * Measure List objects performance of Bolt / GS.
+      ```json
+      {"requestType": "list_objects", "bucket": "<bucket>"}
+      ```
+    * Measure Download object performance of Bolt / GS.
+      ```json
+      {"requestType": "download_object", "bucket": "<bucket>"}
+      ```
+    * Measure Download object (first byte) performance of Bolt / GS.
+      ```json
+      {"requestType": "download_object_ttfb", "bucket": "<bucket>"} 
+      ```
+    * Measure Download object passthrough performance of Bolt.
+      ```json
+      {"requestType": "download_object_passthrough", "bucket": "<unmonitored-bucket>"}
+      ```
+    * Measure Download object passthrough (first byte) performance of Bolt.
+      ```json
+      {"requestType": "download_object_passthrough_ttfb", "bucket": "<unmonitored-bucket>"}
+      ```
+    * Measure Upload object performance of Bolt / GS.
+      ```json
+      {"requestType": "upload_object", "bucket": "<bucket>"}
+      ```
+    * Measure Delete object performance of Bolt / GS.
+      ```json
+      {"requestType": "delete_object", "bucket": "<bucket>"}
+      ```
+    * Measure Upload, Delete, Download, List objects performance of Bolt / GS.
+      ```json
+      {"requestType": "all", "bucket": "<bucket>"}
+      ```
+      
+
+#### bolt_auto_heal_handler
+
+* bolt_auto_heal_handler represents a Google Cloud Function that is invoked by an HTTP Request for performing
+  Auto-Heal testing.Before running this function, modify `data-cruncher` to use `coldline` tier-class and 
+  set `backupduration` and `recoveryscannerperiod` to `1 minute` to ensure that the auto-healing duration is
+  within the function execution timeout interval. Crunch a sample bucket having a single object.
+  Then delete the single fragment object from the `n-data` bucket. Now run this function, passing the name of the
+  crunched bucket along with the single object as input parameters to the function. To use this Function,
+  change the entry point to `bolt_auto_heal_handler`.
+  
+
+* BoltAutoHealHandler accepts the following input parameters as part of the event:
+  * bucket - bucket name
+    
+  * key - key name
+    
+
+* Following is an example of a HTTP Request that can be used to invoke the function.
+    * Measure Auto-Heal time of an object in Bolt.
+      ```json
+      {"bucket": "<bucket>", "key": "<key>"}
+      ```

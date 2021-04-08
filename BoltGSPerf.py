@@ -11,6 +11,10 @@ from BoltGSOpsClient import BoltGSOpsClient
 
 
 class BoltGSPerf:
+    """
+    BoltGSPerf processes Http Requests that are received by the function
+    bolt_gs_perf_handler.
+    """
 
     # constants for PUT/DELETE Object Perf
     # max. no of keys to be used in
@@ -45,6 +49,13 @@ class BoltGSPerf:
         self._bolt_uncmp_obj_count = 0
 
     def process_event(self, request):
+        """
+        process_event extracts the parameters (requestType, bucket) from the HTTP Request, uses those
+        parameters to run performance testing against Bolt/GS and returns back performance statistics.
+
+        :param request: request object
+        :return: performance statistics
+        """
 
         # Parse JSON Request.
         request_json = request.get_json()
@@ -100,6 +111,13 @@ class BoltGSPerf:
             }
 
     def _list_objects_perf(self, bucket_name, num_iter=10):
+        """
+        Measures the List Objects performance (latency, throughput) of Bolt / GS.
+
+        :param bucket_name: bucket name
+        :param num_iter: number of iterations
+        :return: List Objects performance statistics.
+        """
 
         # list 1000 objects from Bolt / GS, num_iter times.
         for x in range(num_iter):
@@ -143,6 +161,12 @@ class BoltGSPerf:
             return json.dumps(list_objects_perf_stats, indent=4, sort_keys=True)
 
     def _download_object_perf(self, bucket_name):
+        """
+        Measures the Download Object performance (latency, throughput) of Bolt / GS.
+
+        :param bucket_name: bucket name
+        :return: Download Object performance statistics
+        """
         # Get blobs from Bolt/GS.
         for key in self._keys:
             # Get blob from GS.
@@ -219,6 +243,12 @@ class BoltGSPerf:
             return json.dumps(download_obj_perf_stats, indent=4, sort_keys=True)
 
     def _download_object_passthrough_perf(self, bucket_name):
+        """
+        Measures the Download Object passthrough performance (latency, throughput) of Bolt / GS.
+
+        :param bucket_name: name of unmonitored bucket
+        :return: Download Object passthrough performance statistics
+        """
         # Get Objects via passthrough from Bolt.
         for key in self._keys:
             # Get blob from Bolt.
@@ -264,6 +294,12 @@ class BoltGSPerf:
             return json.dumps(download_obj_pt_perf_stats, indent=4, sort_keys=True)
 
     def _upload_object_perf(self, bucket_name):
+        """
+        Measures the Upload Object performance (latency, throughput) of Bolt / GS.
+
+        :param bucket_name: bucket name
+        :return: Upload Object performance statistics
+        """
         # Upload objects to Bolt/GS.
         for key in self._keys:
             value = self._generate(characters=string.ascii_lowercase, length=self.OBJ_LENGTH)
@@ -305,6 +341,12 @@ class BoltGSPerf:
             return json.dumps(upload_obj_perf_stats, indent=4, sort_keys=True)
 
     def _delete_object_perf(self, bucket_name):
+        """
+        Measures the Delete Object performance (latency, throughput) of Bolt / GS.
+
+        :param bucket_name: bucket name
+        :return: Delete Object performance statistics
+        """
         # Delete Objects from Bolt/GS.
         for key in self._keys:
             # Delete blob from GS.
@@ -343,6 +385,13 @@ class BoltGSPerf:
             return json.dumps(del_obj_perf_stats, indent=4, sort_keys=True)
 
     def _all_perf(self, bucket_name):
+        """
+        Measures Upload, Download, Delete, List Objects
+        performance (latency, throughput) of Bolt / GS.
+
+        :param bucket_name: bucket name
+        :return: Object performance statistics
+        """
         # Upload / Delete Objects using generated key names.
         upload_obj_perf_stats = self._upload_object_perf(bucket_name)
         self._clear_stats()
@@ -367,6 +416,7 @@ class BoltGSPerf:
         """
         Merge one or more dictionaries containing
         performance statistics into one dictionary.
+
         :param perf_stats: one or more performance statistics
         :return: merged performance statistics
         """
@@ -378,6 +428,7 @@ class BoltGSPerf:
     def _compute_perf_stats(self, op_times, op_tp=None, obj_sizes=None):
         """
         Compute performance statistics
+
         :param op_times: list of latencies
         :param op_tp: list of throughputs
         :param obj_sizes: list of object sizes
@@ -433,6 +484,10 @@ class BoltGSPerf:
         return perf_stats
 
     def _clear_stats(self):
+        """
+        clears the structures maintaining performance statistics.
+        """
+
         self._bolt_op_times.clear()
         self._gs_op_times.clear()
         self._bolt_op_tp.clear()
@@ -446,7 +501,7 @@ class BoltGSPerf:
 
     def _generate_key_names(self, num_objects):
         """
-        Generate Object names to be used in PUT/GET Object operations.
+        Generate Object names to be used in Upload/Delete Object operations.
         :param num_objects: number of objects
         :return: list of object names
         """
