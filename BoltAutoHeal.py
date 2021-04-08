@@ -5,6 +5,10 @@ from BoltGSOpsClient import BoltGSOpsClient
 
 
 class BoltAutoHeal:
+    """
+    BoltAutoHeal processes Http Requests that are received by the function
+    bolt_auto_heal_handler.
+    """
 
     def __init__(self):
         # create bolt storage client.
@@ -13,6 +17,13 @@ class BoltAutoHeal:
         self._bolt_storage_client = storage.Client(client_options=client_options)
 
     def process_event(self, request):
+        """
+        process_event extracts the parameters (bucket, key) from the HTTP Request, uses those
+        parameters to perform auto-heal test.
+
+        :param request: request object
+        :return: time taken to auto-heal
+        """
         # Parse JSON Request.
         request_json = request.get_json()
 
@@ -26,6 +37,14 @@ class BoltAutoHeal:
         return self.get_blob_until_success(bucket_name, object_name)
 
     def get_blob_until_success(self, bucket_name, object_name):
+        """
+        get_blob_until_success attempts to retrieve object repeatedly until it succeeds,
+        which would indicate successful auto-healing of the object.
+
+        :param bucket_name: bucket name
+        :param object_name: object name
+        :return: time taken to auto-heal
+        """
         auto_heal_start_time = time.time()
         while True:
             try:
