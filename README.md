@@ -33,10 +33,18 @@ gcloud functions deploy <function-name> \
 
 ### Usage
 
-* The sample Python Cloud Function can be tested from the Google Cloud Console by specifying a 
-  triggering event in JSON format.
+The sample Python Cloud Function illustrates the usage and various operations, via separate entry points,
+that can be performed using Cloud Storage Client library for Python. The deployed Python Cloud Function can be tested
+from the Google Cloud Console by specifying a triggering event in JSON format.
 
-#### bolt_gs_ops_handler
+Please ensure that `Bolt` is deployed before testing the sample Python Cloud Function. If you haven't deployed `Bolt`,
+follow the instructions given [here](https://xyz.projectn.co/installation-guide#estimate-savings) to deploy `Bolt`.
+
+#### Testing Bolt or GS Operations
+
+`bolt_gs_ops_handler` is the function that enables the user to perform Bolt or GS operations.
+It sends a Bucket or Object request to Bolt or GS and returns an appropriate response based on the parameters
+passed in as input.
 
 * bolt_gs_ops_handler represents a Google Cloud Function that is invoked by an HTTP Request.
 
@@ -91,7 +99,11 @@ gcloud functions deploy <function-name> \
       ```
 
 
-#### bolt_gs_validate_obj_handler
+#### Data Validation Tests
+
+`bolt_gs_validate_obj_handler` is the function that enables the user to perform data validation tests. It retrieves
+the object from Bolt and GS (Bucket Cleaning is disabled), computes and returns their corresponding MD5 hash.
+If the object is gzip encoded, object is decompressed before computing its MD5.
 
 * bolt_gs_validate_obj_handler represents a Google Cloud Function that is invoked by an HTTP Request for performing
   data validation tests. To use this Function, change the entry point to `bolt_gs_validate_obj_handler`
@@ -111,11 +123,16 @@ gcloud functions deploy <function-name> \
       ```
 
       
-#### bolt_gs_perf_handler
+#### Performance Tests
+
+`bolt_gs_perf_handler` is the function that enables the user to run Bolt or GS Performance tests. It measures the 
+performance of Bolt or GS Operations and returns statistics based on the operation. Before using this
+handler, ensure that a source bucket has been crunched by `Bolt` with cleaner turned `OFF`. `Get, List Objects` tests
+are run using the first 1000 objects in the bucket and `Put Object` tests are run using objects of size `100 bytes`.
+`Delete Object` tests are run on objects that were created by the `Put Object` test.
 
 * bolt_gs_perf_handler represents a Google Cloud Function that is invoked by an HTTP Request for performing
-  Bolt / GS Performance testing. Before running this function, ensure that a source bucket has been crunched by
-  `Bolt` with cleaner turned `OFF`. To use this Function, change the entry point to `bolt_gs_perf_handler`.
+  Bolt / GS Performance testing. To use this Function, change the entry point to `bolt_gs_perf_handler`.
   
 
 * bolt_gs_perf_handler accepts the following input parameters as part of the HTTP Request:
@@ -167,15 +184,18 @@ gcloud functions deploy <function-name> \
       ```
       
 
-#### bolt_auto_heal_handler
+#### Auto Heal Tests
+
+`bolt_auto_heal_handler` is the function that enables the user to run auto heal tests. Before running this function,
+modify `data-cruncher` to use `coldline` tier-class and set `backupduration` and `recoveryscannerperiod` to `1 minute` 
+to ensure that the auto-healing duration is within the function execution timeout interval. Crunch a sample bucket
+having a single object. Then delete the single fragment object from the `n-data` bucket. Now run this function,
+passing the name of the crunched bucket along with the single object as input parameters to the function. The handler
+attempts to retrieve object repeatedly until it succeeds, which would indicate successful auto-healing of the object
+and returns the time taken to do so.
 
 * bolt_auto_heal_handler represents a Google Cloud Function that is invoked by an HTTP Request for performing
-  Auto-Heal testing.Before running this function, modify `data-cruncher` to use `coldline` tier-class and 
-  set `backupduration` and `recoveryscannerperiod` to `1 minute` to ensure that the auto-healing duration is
-  within the function execution timeout interval. Crunch a sample bucket having a single object.
-  Then delete the single fragment object from the `n-data` bucket. Now run this function, passing the name of the
-  crunched bucket along with the single object as input parameters to the function. To use this Function,
-  change the entry point to `bolt_auto_heal_handler`.
+  Auto-Heal testing. To use this Function, change the entry point to `bolt_auto_heal_handler`.
   
 
 * BoltAutoHealHandler accepts the following input parameters as part of the event:
@@ -189,3 +209,8 @@ gcloud functions deploy <function-name> \
       ```json
       {"bucket": "<bucket>", "key": "<key>"}
       ```
+
+### Getting Help
+
+For additional assistance, please refer to [Project N Docs](https://xyz.projectn.co/) or contact us directly
+[here](mailto:support@projectn.co)
